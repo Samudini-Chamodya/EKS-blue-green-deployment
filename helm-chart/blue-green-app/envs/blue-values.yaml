@@ -1,0 +1,10 @@
+image:
+  tag: "blue"
+
+env:
+  - name: VERSION
+    value: "blue"
+  - name: PORT
+    value: "3000"
+
+replicaCount: 3
