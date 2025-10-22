@@ -1,0 +1,29 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: blue-green-cluster        # Your cluster name
+  region: us-east-1               # AWS region (change if needed)
+  version: "1.32"                 # Kubernetes version
+
+iam:
+  withOIDC: true                  # Enables IAM roles for service accounts
+
+managedNodeGroups:                # Worker nodes configuration
+  - name: ng-1                    # Node group name
+    instanceType: t3.medium       # EC2 instance type (2 vCPU, 4GB RAM)
+    minSize: 2                    # Minimum number of nodes
+    maxSize: 4                    # Maximum number of nodes (for auto-scaling)
+    desiredCapacity: 2            # Initial number of nodes
+    volumeSize: 20                # Disk size per node (GB)
+    ssh:
+      allow: false                # Security: Disable SSH access
+    labels:
+      role: worker                # Label for identifying worker nodes
+    tags:
+      Environment: development
+      Project: blue-green-demo
+
+cloudWatch:                       # Enable logging for troubleshooting
+  clusterLogging:
+    enableTypes: ["api", "audit", "authenticator", "controllerManager", "scheduler"]
