@@ -831,8 +831,3 @@ Check:
 4. **Use smaller instances**: t3.small instead of t3.medium
 5. **Limit logging**: Reduce CloudWatch retention
 ---
-
-## 🎯 Next Steps
-
-1. **Add Monitoring**: Install Prometheus & Grafana
-2. **Add Ingress**: Use AWS ALB Ingress Controller
