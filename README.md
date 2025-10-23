@@ -713,7 +713,7 @@ Navigate to **Workloads → Pods**
 Click on any pod → Logs tab
 
 #### 11.5 View Services
-
+![Lens Pod Logs](screenshots/14.png)
 Navigate to **Network → Services**
 
 #### 11.6 Real-time Switch Monitoring
