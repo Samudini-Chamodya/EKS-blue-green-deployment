@@ -2,7 +2,6 @@
 
 A comprehensive guide to implementing a production-ready CI/CD pipeline with blue-green deployment strategy on AWS EKS using ArgoCD and Helm.
 
-![Project Architecture](screenshots/architecture-diagram.png)
 
 ## 📋 Table of Contents
 
@@ -97,7 +96,6 @@ This project demonstrates:
 
 ### Required Tools (Windows)
 
-![Prerequisites Tools](screenshots/prerequisites-tools.png)
 
 | Tool | Version | Purpose |
 |------|---------|---------|
@@ -135,7 +133,6 @@ Running this setup will incur AWS costs (~$133/month):
 
 #### 1.1 Install Chocolatey
 
-![Chocolatey Installation](screenshots/chocolatey-install.png)
 
 ```powershell
 # Run PowerShell as Administrator
@@ -151,7 +148,6 @@ Chocolatey v1.x.x installed successfully.
 
 #### 1.2 Install Required Tools
 
-![Tool Installation Progress](screenshots/tools-installation.png)
 
 ```powershell
 # Install all tools at once
@@ -159,8 +155,6 @@ choco install awscli kubernetes-cli kubernetes-helm eksctl git docker-desktop -y
 ```
 
 #### 1.3 Verify Installations
-
-![Version Verification](screenshots/version-check.png)
 
 ```powershell
 aws --version        # aws-cli/2.x.x
@@ -175,7 +169,7 @@ docker --version     # Docker version 24.x.x
 
 #### 2.1 Setup AWS CLI
 
-![AWS Configure](screenshots/aws-configure.png)
+![AWS Configure](screenshots/0.png)
 
 ```powershell
 aws configure
@@ -190,8 +184,6 @@ Default output format [None]: json
 ```
 
 #### 2.2 Verify AWS Connection
-
-![AWS Identity](screenshots/aws-identity.png)
 
 ```powershell
 aws sts get-caller-identity
@@ -214,7 +206,7 @@ aws sts get-caller-identity
 
 #### 3.1 Initialize Project
 
-![Project Structure](screenshots/project-structure.png)
+![Project Structure](screenshots/9.png)
 
 ```powershell
 mkdir eks-blue-green-demo
@@ -248,9 +240,6 @@ eks-blue-green-demo/
 │   ├── service-active.yaml
 │   ├── network-policy.yaml
 │   └── pod-security.yaml
-├── scripts/                       # Automation scripts
-│   ├── switch-environment.ps1
-│   └── test-deployment.ps1
 ├── .github/
 │   └── workflows/
 │       └── deploy.yaml            # CI/CD pipeline
@@ -318,21 +307,21 @@ app.listen(PORT, () => {
 
 #### 3.3 Build and Test Locally
 
-![Docker Build](screenshots/docker-build.png)
+![Docker Build](screenshots/1.png)
 
+![Docker Build](screenshots/18.png)
+ 
 ```powershell
 # Build the image
 docker build -t blue-green-demo:blue .
 ```
-
-![Docker Run](screenshots/docker-run-test.png)
 
 ```powershell
 # Test locally
 docker run -d -p 3000:3000 -e VERSION=blue --name test-app blue-green-demo:blue
 ```
 
-![Application Blue Version](screenshots/app-blue-local.png)
+![Application Blue Version](screenshots/3.png)
 
 Open browser to `http://localhost:3000` - You should see the blue version.
 
@@ -349,8 +338,6 @@ docker rm test-app
 ### Step 4: Create EKS Cluster
 
 #### 4.1 Create Cluster Configuration
-
-![EKS Config File](screenshots/eks-config-file.png)
 
 **eks-cluster-config.yaml:**
 ```yaml
@@ -387,15 +374,13 @@ cloudWatch:
 
 #### 4.2 Create the Cluster
 
-![EKS Cluster Creation](screenshots/eks-cluster-creation.png)
+![EKS Cluster Creation](screenshots/5.png)
 
 ```powershell
 eksctl create cluster -f eks-cluster-config.yaml
 ```
 
 **This takes 15-20 minutes.** Expected output:
-
-![EKS Creation Progress](screenshots/eks-creation-progress.png)
 
 ```
 [ℹ]  eksctl version 0.x.x
@@ -411,7 +396,7 @@ eksctl create cluster -f eks-cluster-config.yaml
 
 #### 4.3 Verify Cluster
 
-![Kubectl Get Nodes](screenshots/kubectl-get-nodes.png)
+![Kubectl Get Nodes](screenshots/4.png)
 
 ```powershell
 # Check nodes
@@ -423,15 +408,13 @@ ip-xxx-xxx-xxx-xxx.ec2...    Ready    <none>   2m    v1.28.x
 ip-xxx-xxx-xxx-xxx.ec2...    Ready    <none>   2m    v1.28.x
 ```
 
-![EKS Console View](screenshots/eks-console-cluster.png)
-
 **AWS Console:** Navigate to EKS service to see your cluster.
 
 ### Step 5: Setup Amazon ECR
 
 #### 5.1 Create ECR Repository
 
-![ECR Create Repository](screenshots/ecr-create-repo.png)
+![ECR Create Repository](screenshots/7.png)
 
 ```powershell
 aws ecr create-repository --repository-name blue-green-demo --region us-east-1
@@ -449,11 +432,9 @@ aws ecr create-repository --repository-name blue-green-demo --region us-east-1
 }
 ```
 
-![ECR Console View](screenshots/ecr-console-repo.png)
-
 #### 5.2 Login to ECR
 
-![ECR Login](screenshots/ecr-login.png)
+![ECR Login](screenshots/8.png)
 
 ```powershell
 $AWS_ACCOUNT_ID = aws sts get-caller-identity --query Account --output text
@@ -466,8 +447,6 @@ aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --
 
 #### 5.3 Push Images to ECR
 
-![Docker Tag and Push](screenshots/docker-push-ecr.png)
-
 ```powershell
 # Tag and push blue version
 docker tag blue-green-demo:blue "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/blue-green-demo:blue"
@@ -479,8 +458,6 @@ docker tag blue-green-demo:green "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.
 docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/blue-green-demo:green"
 ```
 
-![ECR Images](screenshots/ecr-images-list.png)
-
 **Verify in AWS Console:** You should see both `blue` and `green` tags.
 
 ---
@@ -491,8 +468,6 @@ docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/blue-green-demo:g
 
 #### 6.1 Generate Chart Structure
 
-![Helm Create](screenshots/helm-create-chart.png)
-
 ```powershell
 mkdir helm-chart
 cd helm-chart
@@ -500,8 +475,6 @@ helm create blue-green-app
 ```
 
 #### 6.2 Configure values.yaml
-
-![Helm Values](screenshots/helm-values-config.png)
 
 Update `helm-chart/blue-green-app/values.yaml` with your ECR repository URL:
 
@@ -549,8 +522,6 @@ readinessProbe:
 
 #### 6.3 Create Environment-Specific Values
 
-![Environment Values](screenshots/helm-env-values.png)
-
 ```powershell
 mkdir -p helm-chart/blue-green-app/envs
 ```
@@ -565,7 +536,7 @@ Create `envs/blue-values.yaml` and `envs/green-values.yaml` as shown in the docu
 
 #### 7.1 Install ArgoCD
 
-![ArgoCD Install](screenshots/argocd-install.png)
+![ArgoCD Install](screenshots/10.png)
 
 ```powershell
 # Create namespace
@@ -580,7 +551,6 @@ kubectl wait --for=condition=Ready pods --all -n argocd --timeout=300s
 
 #### 7.2 Expose ArgoCD UI
 
-![ArgoCD Service](screenshots/argocd-service.png)
 
 ```powershell
 # Change to LoadBalancer
@@ -590,35 +560,18 @@ kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}
 kubectl get svc argocd-server -n argocd
 ```
 
-![ArgoCD LoadBalancer](screenshots/argocd-loadbalancer-url.png)
-
 #### 7.3 Get Admin Password
 
-![ArgoCD Password](screenshots/argocd-password.png)
 
 ```powershell
 $ARGOCD_PASSWORD = kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | ForEach-Object { [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($_)) }
 Write-Host "ArgoCD Admin Password: $ARGOCD_PASSWORD"
 ```
-
-#### 7.4 Login to ArgoCD UI
-
-![ArgoCD Login](screenshots/argocd-login-screen.png)
-
-- Username: `admin`
-- Password: Use the password from above
-
-![ArgoCD Dashboard](screenshots/argocd-dashboard-empty.png)
-
----
-
 ## 🚢 Deployment Process
 
 ### Step 8: Deploy with ArgoCD
 
 #### 8.1 Push to GitHub
-
-![GitHub Push](screenshots/github-push.png)
 
 ```powershell
 git add .
@@ -628,11 +581,9 @@ git remote add origin https://github.com/YOUR_USERNAME/eks-blue-green-demo.git
 git push -u origin main
 ```
 
-![GitHub Repository](screenshots/github-repo-view.png)
-
 #### 8.2 Create ArgoCD Application for Blue
 
-![ArgoCD Blue App](screenshots/argocd-blue-application.png)
+![ArgoCD Blue App](screenshots/15.png)
 
 ```powershell
 # Create production namespace
@@ -644,21 +595,17 @@ kubectl apply -f argocd/blue-application.yaml
 
 #### 8.3 Monitor Deployment
 
-![ArgoCD Syncing](screenshots/argocd-syncing.png)
-
 ```powershell
 # Watch the sync
 argocd app get blue-green-app-blue --refresh
 argocd app wait blue-green-app-blue --sync
 ```
 
-![ArgoCD Healthy](screenshots/argocd-app-healthy.png)
-
 **ArgoCD Dashboard:** Application should show as "Healthy" and "Synced".
 
 #### 8.4 Verify Deployment
 
-![Kubectl Pods](screenshots/kubectl-pods-running.png)
+![Kubectl Pods](screenshots/11.png)
 
 ```powershell
 # Check pods
@@ -667,8 +614,6 @@ kubectl get pods -n production
 # Get service URL
 kubectl get svc -n production
 ```
-
-![Blue App Running](screenshots/app-blue-eks.png)
 
 **Open the LoadBalancer URL** - You should see the blue version running.
 
@@ -680,20 +625,14 @@ kubectl get svc -n production
 
 #### 9.1 Deploy Green Application
 
-![ArgoCD Green Deploy](screenshots/argocd-green-deploy.png)
-
 ```powershell
 kubectl apply -f argocd/green-application.yaml
 argocd app wait blue-green-app-green --sync
 ```
 
-![Both Environments](screenshots/argocd-both-apps.png)
-
 **ArgoCD Dashboard:** You should now see both blue and green applications.
 
 #### 9.2 Verify Both Environments
-
-![Pods Both Versions](screenshots/kubectl-pods-both.png)
 
 ```powershell
 kubectl get pods -n production -l app.kubernetes.io/name=blue-green-app
@@ -705,7 +644,7 @@ You should see 6 pods total (3 blue + 3 green).
 
 #### 10.1 Current State (Blue Active)
 
-![Active Service Blue](screenshots/service-blue-active.png)
+![Active Service Blue](screenshots/16.png)
 
 ```powershell
 kubectl get svc blue-green-app-active -n production -o yaml
@@ -713,13 +652,11 @@ kubectl get svc blue-green-app-active -n production -o yaml
 
 #### 10.2 Switch to Green
 
-![Switch to Green](screenshots/switch-green-command.png)
+![Switch to Green](screenshots/14.png)
 
 ```powershell
 .\scripts\switch-environment.ps1 -Target green
 ```
-
-![Switch Progress](screenshots/switch-progress.png)
 
 **Expected Output:**
 ```
@@ -732,11 +669,9 @@ Switch completed! Check your browser.
 
 #### 10.3 Verify Green is Active
 
-![Green App Running](screenshots/app-green-active.png)
+![Green App Running](screenshots/12.png)
 
 **Browser:** Refresh the application - you should now see the green version.
-
-![Service Green Endpoints](screenshots/service-green-endpoints.png)
 
 ```powershell
 kubectl describe svc blue-green-app-active -n production
@@ -744,13 +679,13 @@ kubectl describe svc blue-green-app-active -n production
 
 #### 10.4 Rollback to Blue (if needed)
 
-![Rollback to Blue](screenshots/rollback-blue.png)
+![Rollback to Blue](screenshots/17.png)
 
 ```powershell
 .\scripts\switch-environment.ps1 -Target blue
 ```
 
-![Blue Active Again](screenshots/app-blue-active-again.png)
+![Blue Active Again](screenshots/19.png)
 
 ---
 
@@ -760,41 +695,28 @@ kubectl describe svc blue-green-app-active -n production
 
 #### 11.1 Connect Lens to Cluster
 
-![Lens Add Cluster](screenshots/lens-add-cluster.png)
-
 1. Open Lens IDE
 2. File → Add Cluster
 3. Select your EKS cluster
 
-![Lens Connected](screenshots/lens-cluster-connected.png)
-
 #### 11.2 View Deployments
-
-![Lens Deployments](screenshots/lens-deployments.png)
 
 Navigate to **Workloads → Deployments**
 
 #### 11.3 View Pods
 
-![Lens Pods](screenshots/lens-pods-view.png)
-
+![Lens Pod Logs](screenshots/13.png)
 Navigate to **Workloads → Pods**
 
 #### 11.4 View Logs
-
-![Lens Pod Logs](screenshots/lens-pod-logs.png)
 
 Click on any pod → Logs tab
 
 #### 11.5 View Services
 
-![Lens Services](screenshots/lens-services.png)
-
 Navigate to **Network → Services**
 
 #### 11.6 Real-time Switch Monitoring
-
-![Lens Switch Monitoring](screenshots/lens-switch-realtime.png)
 
 Watch pods during traffic switch:
 1. Keep Lens open on Pods view
@@ -809,7 +731,6 @@ Watch pods during traffic switch:
 
 #### 12.1 Run Test Script
 
-![Load Test](screenshots/load-test-running.png)
 
 ```powershell
 .\scripts\test-deployment.ps1
@@ -825,53 +746,9 @@ Request 3 - Status: 200 - Version: GREEN
 ```
 
 #### 12.2 Test During Switch
-
-![Test During Switch](screenshots/test-during-switch.png)
-
 1. Start the test script in one terminal
 2. Switch environments in another terminal
 3. Observe zero downtime
-
----
-
-## 🔧 CI/CD Pipeline
-
-### Step 13: GitHub Actions
-
-#### 13.1 Add GitHub Secrets
-
-![GitHub Secrets](screenshots/github-secrets.png)
-
-Navigate to: Repository → Settings → Secrets and variables → Actions
-
-Add:
-- `AWS_ACCESS_KEY_ID`
-- `AWS_SECRET_ACCESS_KEY`
-
-#### 13.2 Trigger Pipeline
-
-![GitHub Actions Trigger](screenshots/github-actions-trigger.png)
-
-```powershell
-# Make a change to app.js
-git add .
-git commit -m "Update application"
-git push
-```
-
-#### 13.3 Monitor Pipeline
-
-![GitHub Actions Running](screenshots/github-actions-running.png)
-
-Watch the workflow in GitHub Actions tab.
-
-![GitHub Actions Success](screenshots/github-actions-success.png)
-
-#### 13.4 ArgoCD Auto-Sync
-
-![ArgoCD Auto Sync](screenshots/argocd-auto-sync.png)
-
-ArgoCD will automatically detect changes and sync.
 
 ---
 
@@ -881,18 +758,12 @@ ArgoCD will automatically detect changes and sync.
 
 #### Issue 1: Pods Not Starting
 
-![Pod Error](screenshots/pod-error.png)
-
 ```powershell
 kubectl describe pod <pod-name> -n production
 kubectl logs <pod-name> -n production
 ```
 
-![Pod Describe Output](screenshots/pod-describe.png)
-
 #### Issue 2: Image Pull Errors
-
-![Image Pull Error](screenshots/image-pull-error.png)
 
 ```powershell
 # Check ECR authentication
@@ -901,14 +772,10 @@ aws ecr get-login-password --region us-east-1 | docker login --username AWS --pa
 
 #### Issue 3: Service Not Accessible
 
-![Service Timeout](screenshots/service-timeout.png)
-
 ```powershell
 kubectl get svc -n production
 kubectl describe svc blue-green-app-active -n production
 ```
-
-![Security Group Check](screenshots/security-group-check.png)
 
 Check AWS Console → EC2 → Security Groups
 
@@ -920,16 +787,12 @@ Check AWS Console → EC2 → Security Groups
 
 #### 14.1 Delete Applications
 
-![Delete Apps](screenshots/delete-apps.png)
-
 ```powershell
 kubectl delete application blue-green-app-blue -n argocd
 kubectl delete application blue-green-app-green -n argocd
 ```
 
 #### 14.2 Delete Namespaces
-
-![Delete Namespaces](screenshots/delete-namespaces.png)
 
 ```powershell
 kubectl delete namespace production
@@ -938,27 +801,19 @@ kubectl delete namespace argocd
 
 #### 14.3 Delete EKS Cluster
 
-![Delete Cluster](screenshots/delete-cluster.png)
-
 ```powershell
 eksctl delete cluster --name blue-green-cluster --region us-east-1
 ```
 
 This takes 10-15 minutes.
 
-![Cluster Deleted](screenshots/cluster-deleted.png)
-
 #### 14.4 Delete ECR Repository
-
-![Delete ECR](screenshots/delete-ecr.png)
 
 ```powershell
 aws ecr delete-repository --repository-name blue-green-demo --region us-east-1 --force
 ```
 
 #### 14.5 Verify Cleanup in AWS Console
-
-![AWS Console Clean](screenshots/aws-console-cleanup.png)
 
 Check:
 - EKS → No clusters
@@ -968,20 +823,6 @@ Check:
 
 ---
 
-## 💰 Cost Estimation
-
-### Monthly Costs
-
-| Service | Cost | Notes |
-|---------|------|-------|
-| EKS Control Plane | $73.00 | Fixed cost per cluster |
-| EC2 Instances (2x t3.medium) | $60.48 | ~$0.0416/hour per instance |
-| Load Balancer | ~$16.00 | Classic Load Balancer |
-| Data Transfer | ~$5.00 | Varies by usage |
-| ECR Storage | ~$0.10 | ~1GB of images |
-| CloudWatch Logs | ~$2.00 | Minimal logging |
-| **Total** | **~$156/month** | For 24/7 operation |
-
 ### Cost Optimization Tips
 
 1. **Delete when not in use**: Stop cluster when testing complete
@@ -989,27 +830,6 @@ Check:
 3. **Reduce node count**: Use 1 node for testing
 4. **Use smaller instances**: t3.small instead of t3.medium
 5. **Limit logging**: Reduce CloudWatch retention
-
----
-
-## 📚 Additional Resources
-
-### Documentation
-- [AWS EKS Documentation](https://docs.aws.amazon.com/eks/)
-- [ArgoCD Documentation](https://argo-cd.readthedocs.io/)
-- [Helm Documentation](https://helm.sh/docs/)
-- [Kubernetes Documentation](https://kubernetes.io/docs/)
-
-### Tools
-- [Lens IDE](https://k8slens.dev/)
-- [k9s - Terminal UI](https://k9scli.io/)
-- [kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
-
-### Best Practices
-- [EKS Best Practices Guide](https://aws.github.io/aws-eks-best-practices/)
-- [GitOps Principles](https://opengitops.dev/)
-- [12-Factor App](https://12factor.net/)
-
 ---
 
 ## 🎯 Next Steps
