@@ -118,13 +118,6 @@ This project demonstrates:
   - IAM (create/manage roles)
   - ECR (full access)
 
-### Cost Warning ⚠️
-Running this setup will incur AWS costs (~$133/month):
-- EKS Control Plane: $73/month
-- EC2 Instances (2x t3.medium): $60/month
-- Load Balancers: Variable
-- ECR Storage: Minimal
-
 ---
 
 ## 🚀 Installation Guide
