@@ -226,16 +226,6 @@ eks-blue-green-demo/
 │       └── envs/
 │           ├── blue-values.yaml
 │           └── green-values.yaml
-├── argocd/                         # ArgoCD applications
-│   ├── blue-application.yaml
-│   └── green-application.yaml
-├── k8s/                           # Kubernetes manifests
-│   ├── service-active.yaml
-│   ├── network-policy.yaml
-│   └── pod-security.yaml
-├── .github/
-│   └── workflows/
-│       └── deploy.yaml            # CI/CD pipeline
 └── README.md
 ```
 
